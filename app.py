@@ -281,6 +281,26 @@ with tab2:
                 color = '#0000FF'   # 1명: 파랑
             else:
                 color = '#008000'   # 2명 이상: 녹색
-            return f'background-color: {color}; color: white; font-weight: bold; text-align: center;'
+            return f'background-color: {color}; color: white; font-weight: bold; text-align: center; font-size: 16px;'
 
-        st.table(matrix.style.map(color_coding))
+        styled = matrix.style.map(color_coding)
+
+        # y축(시간대 인덱스)과 초소명 헤더가 어두운 배경에 묻히지 않도록 고대비 스타일 명시 적용
+        styled = styled.set_table_styles([
+            {'selector': 'th.row_heading', 'props': [
+                ('background-color', '#222222'),
+                ('color', '#FFFF00'),
+                ('font-weight', 'bold'),
+                ('font-size', '16px'),
+                ('text-align', 'center'),
+            ]},
+            {'selector': 'th.col_heading', 'props': [
+                ('background-color', '#222222'),
+                ('color', '#FFFF00'),
+                ('font-weight', 'bold'),
+                ('font-size', '16px'),
+                ('text-align', 'center'),
+            ]},
+        ], overwrite=False)
+
+        st.table(styled)
