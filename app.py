@@ -185,6 +185,23 @@ html, body, [class*="css"] {
     font-family: 'Nanum Pen Script', cursive !important;
     font-size: 70% !important;
 }
+
+/* 인쇄(프린트) 전용 스타일
+   - 표의 컬럼 헤더(초소명)를 페이지마다 자동으로 반복 출력
+   - 행이 페이지 경계에서 잘리지 않도록 함
+   - 날짜선택/버튼 등 조회 컨트롤은 인쇄 시 숨겨서, 표가 1페이지부터 바로 시작되도록 함 */
+@media print {
+    thead { display: table-header-group; }
+    tr, td, th { page-break-inside: avoid; }
+
+    [data-testid="stSelectbox"],
+    [data-testid="stButton"],
+    [data-testid="stDateInput"],
+    [data-testid="stTimeInput"],
+    [data-testid="stCaptionContainer"] {
+        display: none !important;
+    }
+}
 </style>
 """, unsafe_allow_html=True)
 
