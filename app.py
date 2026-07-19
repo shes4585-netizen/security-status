@@ -228,21 +228,31 @@ html, body, [class*="css"] {
     font-size: 70% !important;
 }
 
-/* 날짜 선택 드롭다운 - 선택된 값과 펼침 목록을 크게 + 일반 폰트로 */
+/* 입력 컨트롤(날짜/시간 선택, 드롭다운)은 필기체 축소 규칙에서 완전히 제외하고
+   일반 폰트 + 고정 픽셀 크기로 통일 (탭1/탭2 동일 적용).
+   %(상대단위)는 상위요소 축소가 계속 곱해져서 예측 불가능해지므로 px(절대단위)만 사용. */
+/* 1) 먼저 입력 컨트롤 전체(라벨+값)를 일반 폰트/16px로 통일 */
 [data-testid="stSelectbox"] *,
+[data-testid="stDateInput"] *,
+[data-testid="stTimeInput"] *,
 [data-baseweb="menu"],
 [data-baseweb="menu"] * {
-    font-size: 120% !important;
+    font-size: 16px !important;
     font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif !important;
 }
 
-/* 라벨("조회할 날짜 선택")만 원래 캡션과 동일한 절대 크기로 고정
-   (상대단위 %를 쓰면 중첩된 하위요소마다 곱해져서 글자가 계속 작아지므로 px로 고정) */
+/* 2) 그 중 라벨만 나중에 다시 14px로 덮어씀 (CSS는 같은 우선순위일 때 나중 규칙이 이기므로
+      반드시 위 규칙보다 아래에 위치해야 함) */
 [data-testid="stWidgetLabel"],
-[data-testid="stWidgetLabel"] p,
-[data-testid="stWidgetLabel"] span {
-    font-size: 11px !important;
-    font-family: 'Nanum Pen Script', cursive !important;
+[data-testid="stWidgetLabel"] *,
+[data-testid="stDateInput"] label,
+[data-testid="stDateInput"] label *,
+[data-testid="stTimeInput"] label,
+[data-testid="stTimeInput"] label *,
+[data-testid="stSelectbox"] label,
+[data-testid="stSelectbox"] label * {
+    font-size: 14px !important;
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif !important;
 }
 
 /* 인쇄(프린트) 전용 스타일
