@@ -228,14 +228,19 @@ html, body, [class*="css"] {
     font-size: 70% !important;
 }
 
-/* 날짜 선택 드롭다운 - 라벨("조회할 날짜 선택")은 그대로 두고,
-   실제 선택된 값(2026-07-20)과 클릭 시 펼쳐지는 목록만 크게 + 일반 폰트로 표시 */
-[data-baseweb="select"],
-[data-baseweb="select"] *,
+/* 날짜 선택 드롭다운 - 선택된 값과 펼침 목록을 크게 + 일반 폰트로.
+   라벨("조회할 날짜 선택")은 아래 규칙에서 다시 원래 크기로 되돌림 */
+[data-testid="stSelectbox"] *,
 [data-baseweb="menu"],
 [data-baseweb="menu"] * {
     font-size: 150% !important;
     font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif !important;
+}
+
+[data-testid="stWidgetLabel"],
+[data-testid="stWidgetLabel"] * {
+    font-size: 70% !important;
+    font-family: 'Nanum Pen Script', cursive !important;
 }
 
 /* 인쇄(프린트) 전용 스타일
