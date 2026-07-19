@@ -228,15 +228,14 @@ html, body, [class*="css"] {
     font-size: 70% !important;
 }
 
-/* 날짜 선택 드롭다운(탭2 "조회할 날짜 선택")이 너무 작게 보여서 별도로 크게 지정
-   - 드롭다운 버튼 자체와, 클릭했을 때 펼쳐지는 목록(BaseWeb 팝업)까지 모두 포함 */
-[data-testid="stSelectbox"],
-[data-testid="stSelectbox"] * ,
+/* 날짜 선택 드롭다운 - 라벨("조회할 날짜 선택")은 그대로 두고,
+   실제 선택된 값(2026-07-20)과 클릭 시 펼쳐지는 목록만 크게 + 일반 폰트로 표시 */
 [data-baseweb="select"],
 [data-baseweb="select"] *,
 [data-baseweb="menu"],
 [data-baseweb="menu"] * {
-    font-size: 180% !important;
+    font-size: 150% !important;
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif !important;
 }
 
 /* 인쇄(프린트) 전용 스타일
