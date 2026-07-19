@@ -228,18 +228,20 @@ html, body, [class*="css"] {
     font-size: 70% !important;
 }
 
-/* 날짜 선택 드롭다운 - 선택된 값과 펼침 목록을 크게 + 일반 폰트로.
-   라벨("조회할 날짜 선택")은 아래 규칙에서 다시 원래 크기로 되돌림 */
+/* 날짜 선택 드롭다운 - 선택된 값과 펼침 목록을 크게 + 일반 폰트로 */
 [data-testid="stSelectbox"] *,
 [data-baseweb="menu"],
 [data-baseweb="menu"] * {
-    font-size: 150% !important;
+    font-size: 120% !important;
     font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif !important;
 }
 
+/* 라벨("조회할 날짜 선택")만 원래 캡션과 동일한 절대 크기로 고정
+   (상대단위 %를 쓰면 중첩된 하위요소마다 곱해져서 글자가 계속 작아지므로 px로 고정) */
 [data-testid="stWidgetLabel"],
-[data-testid="stWidgetLabel"] * {
-    font-size: 70% !important;
+[data-testid="stWidgetLabel"] p,
+[data-testid="stWidgetLabel"] span {
+    font-size: 11px !important;
     font-family: 'Nanum Pen Script', cursive !important;
 }
 
