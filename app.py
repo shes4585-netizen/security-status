@@ -165,6 +165,48 @@ def get_person_status(name, t, day_data, day_daeche):
     return location, is_off, task_name
 
 
+def get_active_own_code(name, t, today_data):
+    """
+    이 시각에 근무데이터 시트에서 본인이 실제로 수행 중인 코드명(연차 포함)을 반환.
+    get_status()와 동일한 우선순위(연차 → 휴게/기타 태스크)를 따르되,
+    태스크명이 아니라 원본 코드명(예: 휴-1A, 연-2)을 그대로 반환.
+    """
+    s_df = today_data[today_data['경비원명'] == name]
+
+    leave_rows = s_df[s_df['코드명'].str.startswith('연-')]
+    if not leave_rows.empty:
+        leave_code = leave_rows.iloc[0]['코드명']
+        if leave_code == '연-1':
+            return leave_code
+        info = 매핑_dict.get(leave_code)
+        if info and in_range(t, info[0], info[1]):
+            return leave_code
+
+    active_code = None
+    for _, row in s_df.iterrows():
+        code = row['코드명']
+        if code.startswith('연-'):
+            continue
+        info = 매핑_dict.get(code)
+        if info and in_range(t, info[0], info[1]):
+            active_code = code
+    return active_code
+
+
+def get_active_sub_code(name, t, today_daeche):
+    """
+    이 시각에 대체근무자 시트에서 실제로 적용 중인 코드명을 반환.
+    (북초소 대체담당자의 동적 판정처럼 대체근무자 시트를 아예 안 쓰는 경우엔 None)
+    """
+    active_code = None
+    sub_rows = today_daeche[today_daeche['경비원명'] == name]
+    for _, row in sub_rows.iterrows():
+        info = 매핑_dict.get(row['코드명'])
+        if info and in_range(t, info[0], info[1]):
+            active_code = row['코드명']
+    return active_code
+
+
 def get_shift_day_data(base_date):
     """
     07:30~익일 07:30을 '하나의 근무일'로 볼 때 필요한 데이터를 모두 모읍니다.
@@ -270,18 +312,38 @@ with tab2:
             # 07:30~익일 07:30을 하나의 근무일로 보려면 두 날짜 데이터를 모두 모아야 합니다.
             today_data, today_daeche = get_shift_day_data(selected_date)
 
-            # 각 초소·시간대별로 초소인원 이름을 모아둠 (숫자 대신 약칭으로 표시하기 위함)
-            results = {t.strftime('%H:%M'): {post: [] for post in posts} for t in time_slots}
+            # 각 초소·시간대별로 초소인원(on)/비초소인원(off) 항목을 각각 모아둠
+            results = {t.strftime('%H:%M'): {post: {'on': [], 'off': []} for post in posts} for t in time_slots}
 
             for t in time_slots:
                 for name in 전체_경비원명:
                     loc, is_off, _ = get_person_status(name, t, today_data, today_daeche)
+                    약칭 = 약칭_dict.get(name, name[:1])
                     if not is_off:
-                        results[t.strftime('%H:%M')][loc].append(약칭_dict.get(name, name[:1]))
+                        # 북초소 대체담당자가 동적 백업(코드 없이 자동 판정)으로 북초소에 들어온 경우는
+                        # 대체근무자 시트 코드가 없으므로 약칭만 표시
+                        if name == 북초소_대체담당자 and loc == '북초소' and get_active_sub_code(name, t, today_daeche) is None:
+                            entry = 약칭
+                        else:
+                            sub_code = get_active_sub_code(name, t, today_daeche)
+                            entry = f"{약칭}({sub_code})" if sub_code else 약칭
+                        results[t.strftime('%H:%M')][loc]['on'].append(entry)
+                    else:
+                        own_code = get_active_own_code(name, t, today_data)
+                        entry = f"{약칭}({own_code})" if own_code else 약칭
+                        results[t.strftime('%H:%M')][loc]['off'].append(entry)
 
-            # 인원수 대신 약칭을 이어붙인 문자열로 표시 (예: 2명 → "근학")
+            # 초소인원은 쉼표로, 비초소인원은 그 뒤에 " / "로 구분해 이어붙임
+            # 예: "근(대체-남A),학 / 창(휴-1B),운(주-3)"
+            def build_cell(entry_dict):
+                on_part = ','.join(entry_dict['on'])
+                off_part = ','.join(entry_dict['off'])
+                if off_part:
+                    return f"{on_part} / {off_part}" if on_part else f" / {off_part}"
+                return on_part
+
             matrix = pd.DataFrame.from_dict(
-                {t: {post: ''.join(names) for post, names in posts_dict.items()} for t, posts_dict in results.items()},
+                {t: {post: build_cell(entry_dict) for post, entry_dict in posts_dict.items()} for t, posts_dict in results.items()},
                 orient='index'
             )
             st.session_state.last_heatmap_data = matrix
@@ -291,7 +353,9 @@ with tab2:
         matrix = st.session_state.last_heatmap_data
 
         def color_coding(val):
-            인원수 = len(str(val)) if val else 0
+            # 색상은 초소인원(근무 중) 수 기준으로만 판정 - " / " 앞부분(초소인원)만 계산
+            on_part = str(val).split(' / ')[0] if val else ''
+            인원수 = len([v for v in on_part.split(',') if v]) if on_part else 0
             if 인원수 == 0:
                 color = '#FF0000'   # 0명: 빨강
             elif 인원수 == 1:
