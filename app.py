@@ -228,6 +228,17 @@ html, body, [class*="css"] {
     font-size: 70% !important;
 }
 
+/* 날짜 선택 드롭다운(탭2 "조회할 날짜 선택")이 너무 작게 보여서 별도로 크게 지정
+   - 드롭다운 버튼 자체와, 클릭했을 때 펼쳐지는 목록(BaseWeb 팝업)까지 모두 포함 */
+[data-testid="stSelectbox"],
+[data-testid="stSelectbox"] * ,
+[data-baseweb="select"],
+[data-baseweb="select"] *,
+[data-baseweb="menu"],
+[data-baseweb="menu"] * {
+    font-size: 180% !important;
+}
+
 /* 인쇄(프린트) 전용 스타일
    - 표의 컬럼 헤더(초소명)를 페이지마다 자동으로 반복 출력
    - 행이 페이지 경계에서 잘리지 않도록 함
