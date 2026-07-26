@@ -263,6 +263,12 @@ html, body, [class*="css"] {
     thead { display: table-header-group; }
     tr, td, th { page-break-inside: avoid; }
 
+    /* 히트맵 표는 인쇄 시에도 화면과 동일하게 크고 굵게 유지 (페이지가 넘어가도 무방함) */
+    table td, table th {
+        font-size: 20px !important;
+        font-weight: 900 !important;
+    }
+
     [data-testid="stSelectbox"],
     [data-testid="stButton"],
     [data-testid="stDateInput"],
@@ -389,24 +395,31 @@ with tab2:
                 color = '#0000FF'   # 1명: 파랑
             else:
                 color = '#008000'   # 2명 이상: 녹색
-            return f'background-color: {color}; color: white; font-weight: bold; text-align: center; font-size: 16px;'
+            return (
+                f'background-color: {color}; color: white; font-weight: 900; '
+                f'text-align: center; font-size: 20px; '
+                f'font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;'
+            )
 
         styled = matrix.style.map(color_coding)
 
         # y축(시간대 인덱스)과 초소명 헤더가 어두운 배경에 묻히지 않도록 고대비 스타일 명시 적용
+        # 인쇄 시 페이지가 넘어가도 상관없으므로, 화면/인쇄 모두 큼직하고 굵게 표시
         styled = styled.set_table_styles([
             {'selector': 'th.row_heading', 'props': [
                 ('background-color', '#222222'),
                 ('color', '#FFFF00'),
-                ('font-weight', 'bold'),
-                ('font-size', '16px'),
+                ('font-weight', '900'),
+                ('font-size', '20px'),
+                ('font-family', '-apple-system, "Segoe UI", Roboto, Arial, sans-serif'),
                 ('text-align', 'center'),
             ]},
             {'selector': 'th.col_heading', 'props': [
                 ('background-color', '#222222'),
                 ('color', '#FFFF00'),
-                ('font-weight', 'bold'),
-                ('font-size', '16px'),
+                ('font-weight', '900'),
+                ('font-size', '20px'),
+                ('font-family', '-apple-system, "Segoe UI", Roboto, Arial, sans-serif'),
                 ('text-align', 'center'),
             ]},
         ], overwrite=False)
